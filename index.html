@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>網站需求問卷</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brown:#2C1A0E;--terra:#FF00BB;--cream:#FAF6F0;
+    --light:#F0E8DC;--line:#DDD0C0;--muted:#8A7060;
+    --dark:#1E0F06;--white:#FFFFFF;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--dark);font-family:'Noto Sans TC',sans-serif;}
+  .header{background:var(--brown);padding:1.25rem 2rem;text-align:center;}
+  .header h1{color:var(--cream);font-size:1.1rem;font-weight:500;letter-spacing:0.06em;}
+  .header p{color:rgba(250,246,240,0.55);font-size:0.8rem;margin-top:4px;}
+  .progress-wrap{background:var(--light);height:3px;}
+  .progress-bar{height:3px;background:var(--terra);transition:width 0.4s;width:0%;}
+  .container{max-width:780px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+  .steps{display:flex;gap:8px;margin-bottom:2.5rem;align-items:center;}
+  .step{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:500;border:1.5px solid var(--line);color:var(--muted);background:var(--white);flex-shrink:0;transition:all 0.3s;}
+  .step.active{background:var(--terra);border-color:var(--terra);color:var(--white);}
+  .step.done{background:var(--brown);border-color:var(--brown);color:var(--white);}
+  .step-line{flex:1;height:1px;background:var(--line);}
+  .section-tag{font-size:0.68rem;letter-spacing:0.25em;color:var(--terra);text-transform:uppercase;font-weight:700;margin-bottom:0.6rem;}
+  .section-title{font-size:1.3rem;font-weight:700;color:var(--dark);margin-bottom:0.4rem;}
+  .section-hint{font-size:0.82rem;color:var(--muted);margin-bottom:1.75rem;line-height:1.6;}
+  .field{margin-bottom:1.5rem;}
+  .field label{display:block;font-size:0.88rem;font-weight:500;color:var(--dark);margin-bottom:6px;}
+  .field .hint{font-size:0.75rem;color:var(--muted);margin-bottom:6px;display:block;line-height:1.5;}
+  .field input,.field textarea,.field select{width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:4px;background:var(--white);color:var(--dark);font-family:'Noto Sans TC',sans-serif;font-size:0.88rem;transition:border-color 0.2s;box-sizing:border-box;}
+  .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--terra);}
+  .field textarea{min-height:80px;resize:vertical;}
+  .required{color:var(--terra);}
+  .dynamic-list{display:flex;flex-direction:column;gap:8px;}
+  .dynamic-row{display:flex;gap:6px;align-items:stretch;}
+  .dynamic-row .field-input{flex:1;padding:10px 14px;border:1px solid var(--line);border-radius:4px;background:var(--white);color:var(--dark);font-family:'Noto Sans TC',sans-serif;font-size:0.88rem;transition:border-color 0.2s;}
+  .dynamic-row .field-input:focus{outline:none;border-color:var(--terra);}
+  .row-btns{display:flex;gap:4px;align-items:flex-start;}
+  .btn-icon{width:36px;height:36px;min-width:36px;border-radius:4px;border:1px solid var(--line);background:var(--white);cursor:pointer;font-size:1.1rem;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;padding:0;font-weight:500;line-height:1;}
+  .btn-add{color:var(--terra);border-color:var(--terra);}
+  .btn-add:hover:not(:disabled){background:var(--terra);color:var(--white);}
+  .btn-remove:hover:not(:disabled){background:#fee;border-color:#f99;color:#c33;}
+  .btn-icon:disabled{opacity:0.3;cursor:not-allowed;}
+  .chip-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:999px;border:1px solid var(--line);font-size:0.82rem;cursor:pointer;color:var(--muted);background:var(--white);transition:all 0.15s;user-select:none;}
+  .chip:hover{border-color:var(--terra);color:var(--terra);}
+  .chip.selected{background:var(--terra);border-color:var(--terra);color:var(--white);font-weight:500;}
+  .chip input{display:none;}
+  .conditional{overflow:hidden;max-height:0;transition:max-height 0.3s ease;}
+  .conditional.open{max-height:800px;}
+  .conditional-inner{padding-top:1.25rem;border-top:1px dashed var(--line);margin-top:0.5rem;}
+  .addon-toggle{display:flex;align-items:flex-start;gap:12px;padding:1rem 1.25rem;border:1px solid var(--line);border-radius:6px;background:var(--white);cursor:pointer;transition:border-color 0.2s;}
+  .addon-toggle:hover{border-color:var(--terra);}
+  .addon-toggle.active{border-color:var(--terra);background:#fef8f4;}
+  .addon-checkbox{width:20px;height:20px;border-radius:4px;border:1.5px solid var(--line);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;transition:all 0.15s;}
+  .addon-toggle.active .addon-checkbox{background:var(--terra);border-color:var(--terra);color:var(--white);}
+  .addon-title{font-size:0.9rem;font-weight:500;color:var(--dark);}
+  .addon-desc{font-size:0.78rem;color:var(--muted);margin-top:3px;line-height:1.5;}
+  .addon-price{font-size:0.82rem;color:var(--terra);font-weight:700;margin-top:4px;}
+  .divider{height:1px;background:var(--line);margin:2rem 0;}
+  .nav-btns{display:flex;gap:12px;margin-top:2.5rem;}
+  .btn-next{flex:1;padding:13px;background:var(--terra);color:var(--white);font-weight:700;font-size:0.9rem;letter-spacing:0.08em;border:none;border-radius:4px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background 0.2s;}
+  .btn-next:hover{background:#cc0099;}
+  .btn-prev{padding:13px 24px;background:var(--white);color:var(--muted);font-weight:500;font-size:0.9rem;border:1px solid var(--line);border-radius:4px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all 0.2s;}
+  .btn-prev:hover{border-color:var(--terra);color:var(--terra);}
+  .result-box{background:var(--white);border:1px solid var(--line);border-radius:8px;padding:1.5rem;margin-top:1.5rem;}
+  .result-box pre{font-size:0.78rem;font-family:monospace;white-space:pre-wrap;word-break:break-word;color:var(--muted);max-height:320px;overflow-y:auto;}
+  .btn-copy{margin-top:1rem;padding:8px 20px;border:1px solid var(--line);border-radius:4px;background:var(--white);cursor:pointer;font-size:0.82rem;color:var(--muted);font-family:'Noto Sans TC',sans-serif;}
+  .btn-copy:hover{border-color:var(--brown);color:var(--brown);}
+  .copy-ok{font-size:0.78rem;color:green;margin-left:8px;display:none;}
+  .error-msg{font-size:0.8rem;color:#c33;margin-top:6px;display:none;}
+
+  /* ── COLOR PICKER ── */
+  .cp-layout{display:grid;grid-template-columns:1fr 280px;gap:2rem;align-items:start;margin-top:0.75rem;}
+  @media(max-width:640px){.cp-layout{grid-template-columns:1fr;}}
+  .cp-section{margin-bottom:1.4rem;}
+  .cp-label{font-size:0.84rem;font-weight:600;color:var(--dark);margin-bottom:3px;}
+  .cp-sub{font-size:0.72rem;color:var(--muted);margin-bottom:10px;line-height:1.5;}
+
+  /* bg row */
+  .bg-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .bg-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+  .bg-sw{width:42px;height:42px;border-radius:6px;border:2.5px solid transparent;position:relative;transition:transform 0.15s,border-color 0.15s;}
+  .bg-sw:hover{transform:scale(1.08);}
+  .bg-sw.on{border-color:var(--terra);}
+  .bg-sw.on::after{content:'✓';position:absolute;bottom:2px;right:3px;font-size:0.58rem;font-weight:700;color:var(--terra);background:rgba(255,255,255,0.85);border-radius:2px;padding:0 2px;line-height:1.5;}
+  .bg-sw-lbl{font-size:0.66rem;color:var(--muted);}
+
+  /* accent groups — horizontal flowing layout */
+  .ac-all-grps{display:flex;flex-direction:column;gap:0.7rem;}
+  .ac-grp{display:flex;align-items:center;gap:8px;}
+  .ac-grp-lbl{font-size:0.68rem;color:var(--muted);letter-spacing:0.04em;width:3.2rem;flex-shrink:0;}
+  .ac-row{display:flex;gap:7px;flex-wrap:wrap;}
+  .ac-sw{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;position:relative;transition:transform 0.15s,border-color 0.15s;flex-shrink:0;}
+  .ac-sw:hover{transform:scale(1.15);}
+  .ac-sw.on{border-color:var(--terra);box-shadow:0 0 0 2px rgba(255,0,187,0.2);}
+  .ac-sw.on::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:0.58rem;font-weight:900;}
+
+  .sel-display{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;}
+  .sel-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--white);font-size:0.75rem;}
+  .sel-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+
+  /* ── PHONE MOCKUP ── */
+  .mockup-col{position:sticky;top:1.5rem;display:flex;flex-direction:column;align-items:center;}
+  .ph-frame{width:260px;height:540px;border-radius:36px;border:8px solid #181818;background:#181818;overflow:hidden;position:relative;box-shadow:0 20px 64px rgba(0,0,0,0.42);}
+  .ph-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:68px;height:15px;background:#181818;border-radius:0 0 11px 11px;z-index:20;}
+  .ph-screen{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#111;}
+
+  /* hero with real image */
+  .ph-hero{position:relative;flex-shrink:0;height:210px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;}
+  .ph-hero-img{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=500&q=75');background-size:cover;background-position:center 30%;}
+  /* subtle gradient overlay, not too dark */
+  .ph-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.22) 50%,rgba(0,0,0,0.04) 100%);transition:background 0.3s;}
+  .ph-nav{position:absolute;top:0;left:0;right:0;z-index:10;padding:20px 13px 0;display:flex;justify-content:space-between;align-items:center;}
+  .ph-logo-t{font-size:0.6rem;font-weight:700;letter-spacing:0.04em;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.5);}
+  .ph-dots{display:flex;gap:3px;}
+  .ph-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.75);}
+  .ph-hero-content{position:relative;z-index:5;padding:0 13px 13px;display:flex;flex-direction:column;gap:5px;}
+  .ph-eyebrow{font-size:0.44rem;letter-spacing:0.2em;color:rgba(255,255,255,0.72);text-transform:uppercase;}
+  .ph-title{font-size:0.9rem;font-weight:700;line-height:1.35;color:#fff;}
+  .ph-hl{font-style:italic;transition:color 0.3s;}
+  .ph-cta{display:inline-flex;padding:5px 12px;border-radius:3px;font-size:0.48rem;font-weight:700;letter-spacing:0.06em;align-self:flex-start;transition:background 0.3s,color 0.3s;}
+
+  /* below-hero section */
+  .ph-below{flex:1;display:flex;flex-direction:column;overflow:hidden;transition:background 0.3s;}
+  .ph-sub{font-size:0.42rem;padding:7px 13px 0;line-height:1.6;opacity:0.6;}
+  .ph-stats{display:flex;gap:2px;padding:6px 10px;flex-shrink:0;}
+  .ph-stat{flex:1;padding:5px 3px;text-align:center;border-radius:4px;transition:background 0.3s;}
+  .ph-snum{font-size:0.75rem;font-weight:700;line-height:1;margin-bottom:2px;transition:color 0.3s;}
+  .ph-slbl{font-size:0.34rem;opacity:0.55;line-height:1.3;}
+
+  /* service cards with real images */
+  .ph-sec{padding:4px 10px 8px;flex-shrink:0;}
+  .ph-stt{font-size:0.54rem;font-weight:700;margin-bottom:6px;}
+  .ph-cards{display:flex;gap:4px;}
+  .ph-card{flex:1;border-radius:5px;overflow:hidden;border:1px solid;display:flex;flex-direction:column;transition:border-color 0.3s;}
+  .ph-card-img{width:100%;height:42px;background-size:cover;background-position:center;flex-shrink:0;}
+  .ph-card-body{padding:4px 5px 4px;display:flex;flex-direction:column;gap:2px;transition:background 0.3s;}
+  .ph-ct{font-size:0.42rem;font-weight:600;line-height:1.3;}
+  .ph-card-more{font-size:0.34rem;font-weight:700;letter-spacing:0.04em;padding:2px 5px;border-radius:2px;align-self:flex-start;margin-top:2px;transition:background 0.3s,color 0.3s;}
+  .mockup-hint{text-align:center;font-size:0.68rem;color:var(--muted);margin-top:9px;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <h1>網站需求問卷</h1>
+  <p>填完後設計師將收到完整的網站規格與製作咒語</p>
+</div>
+<div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+
+<div class="container">
+  <div class="steps">
+    <div class="step active" id="s1">1</div><div class="step-line"></div>
+    <div class="step" id="s2">2</div><div class="step-line"></div>
+    <div class="step" id="s3">3</div><div class="step-line"></div>
+    <div class="step" id="s4">4</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <div class="section-tag">Step 01</div>
+    <div class="section-title">基本資訊</div>
+    <div class="section-hint">請填寫您的基本資料，讓設計師能夠了解您的品牌。</div>
+    <div class="field">
+      <label>網站顯示名稱 <span class="required">*</span></label>
+      <span class="hint">搜尋引擎秀出的名稱，不一定要是公司登記全名<br>例：6800網頁設計｜帥哥消防工程｜住的好好室內設計</span>
+      <input type="text" id="company" placeholder="您希望訪客看到的品牌名稱">
+      <div class="error-msg" id="err-company">請填寫網站顯示名稱</div>
+    </div>
+    <div class="field">
+      <label>行業別 <span class="required">*</span></label>
+      <select id="industry">
+        <option value="">請選擇您的產業</option>
+        <option value="engineering">工程／施工（消防、水電、冷氣、裝潢）</option>
+        <option value="consulting">顧問／專業服務（法律、會計、HR、保險）</option>
+        <option value="medical">醫療美容（診所、中醫、美容工作室）</option>
+        <option value="food">餐飲（咖啡廳、小吃、烘焙）</option>
+        <option value="design">設計／創意（室內設計、品牌設計、攝影）</option>
+        <option value="other">其他</option>
+      </select>
+      <div class="error-msg" id="err-industry">請選擇行業別</div>
+    </div>
+    <div class="field">
+      <label>聯絡方式（顯示在網站上的）<span class="required">*</span></label>
+      <span class="hint">最多可新增 6 項</span>
+      <div class="dynamic-list" id="contact-list">
+        <div class="dynamic-row">
+          <input type="text" class="field-input" placeholder="電話｜0912-345-678">
+          <div class="row-btns">
+            <button class="btn-icon btn-add" onclick="addRow('contact-list',6,'text','contact')">＋</button>
+            <button class="btn-icon btn-remove" onclick="removeRow(this)" disabled>−</button>
+          </div>
+        </div>
+        <div class="dynamic-row">
+          <input type="text" class="field-input" placeholder="Line｜@yourline">
+          <div class="row-btns">
+            <button class="btn-icon btn-add" onclick="addRow('contact-list',6,'text','contact')">＋</button>
+            <button class="btn-icon btn-remove" onclick="removeRow(this)">−</button>
+          </div>
+        </div>
+        <div class="dynamic-row">
+          <input type="text" class="field-input" placeholder="Email｜info@yourcompany.com">
+          <div class="row-btns">
+            <button class="btn-icon btn-add" onclick="addRow('contact-list',6,'text','contact')">＋</button>
+            <button class="btn-icon btn-remove" onclick="removeRow(this)">−</button>
+          </div>
+        </div>
+        <div class="dynamic-row">
+          <input type="text" class="field-input" placeholder="地址｜台北市○○區○○路○號">
+          <div class="row-btns">
+            <button class="btn-icon btn-add" onclick="addRow('contact-list',6,'text','contact')">＋</button>
+            <button class="btn-icon btn-remove" onclick="removeRow(this)">−</button>
+          </div>
+        </div>
+      </div>
+      <div class="error-msg" id="err-contact">請至少填寫一項聯絡方式</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-next" onclick="goStep(2)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" style="display:none">
+    <div class="section-tag">Step 02</div>
+    <div class="section-title">品牌核心</div>
+    <div class="section-hint">讓我們了解您的品牌故事與核心優勢。</div>
+    <div class="field">
+      <label>USP（您最想讓客戶記住的一句話）<span class="required">*</span></label>
+      <span class="hint">例：20年消防經驗，台北縣市最快速、最安心的消防工程</span>
+      <textarea id="usp" placeholder="請用一兩句話描述您最核心的競爭優勢"></textarea>
+      <div class="error-msg" id="err-usp">請填寫 USP</div>
+    </div>
+    <div class="field">
+      <label>核心服務項目 <span class="required">*</span></label>
+      <span class="hint">最多 8 項，格式：服務名稱｜一句話說明</span>
+      <div class="dynamic-list" id="svc-list">
+        <div class="dynamic-row">
+          <input type="text" class="field-input" placeholder="消防設備安裝｜符合法規、快速核驗">
+          <div class="row-btns">
+            <button class="btn-icon btn-add" onclick="addRow('svc-list',8,'text','svc')">＋</button>
+            <button class="btn-icon btn-remove" onclick="removeRow(this)" disabled>−</button>
+          </div>
+        </div>
+      </div>
+      <div class="error-msg" id="err-svc">請至少填寫一項服務</div>
+    </div>
+    <div class="field">
+      <label>品牌故事／創業動機</label>
+      <textarea id="story" placeholder="（選填）為什麼創立這個品牌？有什麼特別的堅持？"></textarea>
+    </div>
+    <div class="field">
+      <label>信任背書</label>
+      <span class="hint">例：執業20年｜完工500件｜98%客戶好評｜得獎紀錄（有具體數字最好，這些會用在成就區塊）</span>
+      <textarea id="trust" placeholder="（選填）任何可以增加可信度的資訊"></textarea>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-prev" onclick="goStep(1)">← 上一步</button>
+      <button class="btn-next" onclick="goStep(3)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="step3" style="display:none">
+    <div class="section-tag">Step 03</div>
+    <div class="section-title">功能與配色</div>
+    <div class="section-hint">設定網站功能需求，以及您的品牌配色偏好。</div>
+
+    <div class="field">
+      <label>需要哪些動態功能？</label>
+      <div class="chip-group">
+        <label class="chip"><input type="checkbox" name="dynamic" value="部落格/文章"> 部落格 / 文章</label>
+        <label class="chip"><input type="checkbox" name="dynamic" value="作品集展示" id="chip-portfolio"> 作品集展示</label>
+      </div>
+    </div>
+
+    <div class="conditional" id="cond-portfolio">
+      <div class="conditional-inner">
+        <div class="field">
+          <label>作品集分類</label>
+          <div class="dynamic-list" id="portfolio-list">
+            <div class="dynamic-row">
+              <input type="text" class="field-input" placeholder="分類名稱，例如：住宅工程">
+              <div class="row-btns">
+                <button class="btn-icon btn-add" onclick="addRow('portfolio-list',6,'text','portfolio')">＋</button>
+                <button class="btn-icon btn-remove" onclick="removeRow(this)" disabled>−</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="addon-toggle" id="product-toggle" onclick="toggleAddon()">
+        <div class="addon-checkbox" id="product-checkbox"></div>
+        <div>
+          <div class="addon-title">產品展示加購模組</div>
+          <div class="addon-desc">讓訪客直接在網站上瀏覽商品規格，並導流至 LINE 或電話詢價</div>
+          <div class="addon-price">+ NT$2,000 / 年</div>
+        </div>
+      </div>
+      <div class="conditional" id="cond-product">
+        <div class="conditional-inner">
+          <div class="field">
+            <label>商品分類</label>
+            <div class="dynamic-list" id="product-list">
+              <div class="dynamic-row">
+                <input type="text" class="field-input" placeholder="分類名稱，例如：滅火器｜灑水頭">
+                <div class="row-btns">
+                  <button class="btn-icon btn-add" onclick="addRow('product-list',8,'text','product')">＋</button>
+                  <button class="btn-icon btn-remove" onclick="removeRow(this)" disabled>−</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- COLOR PICKER -->
+    <div class="field">
+      <label>偏好的網站配色 <span class="required">*</span></label>
+      <span class="hint">右側手機預覽會即時更新，選完就知道效果如何</span>
+      <div class="error-msg" id="err-color">請完成配色選擇</div>
+
+      <div class="cp-layout">
+        <!-- TOP: color controls -->
+        <div>
+          <!-- BG -->
+          <div class="cp-section">
+            <div class="cp-label">底色</div>
+            <div class="cp-sub">網站主要背景，決定整體氛圍</div>
+            <div class="bg-row">
+              <div class="bg-item" onclick="selBg(this)" data-hex="#111111" data-name="黑">
+                <div class="bg-sw on" style="background:#111111"></div>
+                <div class="bg-sw-lbl">黑</div>
+              </div>
+              <div class="bg-item" onclick="selBg(this)" data-hex="#F4F4F4" data-name="淺灰">
+                <div class="bg-sw" style="background:#F4F4F4;border:1px solid #ccc"></div>
+                <div class="bg-sw-lbl">淺灰</div>
+              </div>
+              <div class="bg-item" onclick="selBg(this)" data-hex="#FFFFFF" data-name="白">
+                <div class="bg-sw" style="background:#FFFFFF;border:1px solid #ccc"></div>
+                <div class="bg-sw-lbl">白</div>
+              </div>
+              <div class="bg-item" onclick="selBg(this)" data-hex="#1A1209" data-name="深棕黑">
+                <div class="bg-sw" style="background:#1A1209"></div>
+                <div class="bg-sw-lbl">深棕黑</div>
+              </div>
+              <div class="bg-item" onclick="selBg(this)" data-hex="#0A1628" data-name="深夜藍">
+                <div class="bg-sw" style="background:#0A1628"></div>
+                <div class="bg-sw-lbl">深夜藍</div>
+              </div>
+              <div class="bg-item" onclick="selBg(this)" data-hex="#FAF6F0" data-name="米白">
+                <div class="bg-sw" style="background:#FAF6F0;border:1px solid #ccc"></div>
+                <div class="bg-sw-lbl">米白</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACCENT -->
+          <div class="cp-section">
+            <div class="cp-label">輔助色</div>
+            <div class="cp-sub">用於按鈕、標題強調字、裝飾線等重點位置</div>
+
+            <div class="ac-all-grps">
+              <div class="ac-grp">
+                <div class="ac-grp-lbl">紅系</div>
+                <div class="ac-row">
+                  <div class="ac-sw on" onclick="selAc(this)" data-hex="#E53935" data-name="紅" style="background:#E53935" title="紅"></div>
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#8B1A1A" data-name="酒紅" style="background:#8B1A1A" title="酒紅"></div>
+                </div>
+              </div>
+              <div class="ac-grp">
+                <div class="ac-grp-lbl">藍系</div>
+                <div class="ac-row">
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#1976D2" data-name="藍" style="background:#1976D2" title="藍"></div>
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#0D1B4B" data-name="深藍" style="background:#0D1B4B" title="深藍"></div>
+                </div>
+              </div>
+              <div class="ac-grp">
+                <div class="ac-grp-lbl">暖色系</div>
+                <div class="ac-row">
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#F9A825" data-name="黃" style="background:#F9A825" title="黃"></div>
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#E65100" data-name="橘" style="background:#E65100" title="橘"></div>
+                </div>
+              </div>
+              <div class="ac-grp">
+                <div class="ac-grp-lbl">綠系</div>
+                <div class="ac-row">
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#2E7D32" data-name="綠" style="background:#2E7D32" title="綠"></div>
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#1B3A2D" data-name="墨綠" style="background:#1B3A2D" title="墨綠"></div>
+                </div>
+              </div>
+              <div class="ac-grp">
+                <div class="ac-grp-lbl">中性</div>
+                <div class="ac-row">
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#1a1a1a" data-name="黑" style="background:#1a1a1a" title="黑"></div>
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#FFFFFF" data-name="白" style="background:#FFFFFF;border:1.5px solid #bbb" title="白"></div>
+                </div>
+              </div>
+              <div class="ac-grp">
+                <div class="ac-grp-lbl">大地色</div>
+                <div class="ac-row">
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#C8B99A" data-name="卡其色" style="background:#C8B99A" title="卡其色"></div>
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#6D4C2A" data-name="咖啡色" style="background:#6D4C2A" title="咖啡色"></div>
+                </div>
+              </div>
+              <div class="ac-grp">
+                <div class="ac-grp-lbl">清新色</div>
+                <div class="ac-row">
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#64B5F6" data-name="天空藍" style="background:#64B5F6" title="天空藍"></div>
+                  <div class="ac-sw" onclick="selAc(this)" data-hex="#F48FB1" data-name="粉紅色" style="background:#F48FB1" title="粉紅色"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sel-display">
+            <div class="sel-tag"><div class="sel-dot" id="dot-bg" style="background:#111111;border:1px solid #444"></div><span id="lbl-bg">底色：黑</span></div>
+            <div class="sel-tag"><div class="sel-dot" id="dot-ac" style="background:#E53935"></div><span id="lbl-ac">輔色：紅</span></div>
+          </div>
+        </div>
+
+        <!-- BOTTOM: full-width mockup -->
+        <div class="mockup-col">
+          <div class="ph-frame">
+            <div class="ph-notch"></div>
+            <div class="ph-screen" id="ph-screen">
+
+              <!-- Hero with real image -->
+              <div class="ph-hero">
+                <div class="ph-hero-img" id="ph-hero-img"></div>
+                <div class="ph-hero-overlay" id="ph-overlay"></div>
+                <div class="ph-nav">
+                  <div class="ph-logo-t" id="ph-logo">您的品牌</div>
+                  <div class="ph-dots">
+                    <div class="ph-dot"></div>
+                    <div class="ph-dot"></div>
+                    <div class="ph-dot"></div>
+                  </div>
+                </div>
+                <div class="ph-hero-content">
+                  <div class="ph-eyebrow" id="ph-ey">PROFESSIONAL · TRUSTED</div>
+                  <div class="ph-title" id="ph-tt">深耕專業<br>成就<span class="ph-hl" id="ph-hl">永恆</span>價值</div>
+                  <div class="ph-cta" id="ph-cta">立即諮詢 →</div>
+                </div>
+              </div>
+
+              <!-- Below hero: bg color -->
+              <div class="ph-below" id="ph-below">
+                <div class="ph-sub" id="ph-sb">我們用多年的經驗，為每一位客戶打造最值得信賴的解決方案。</div>
+                <div class="ph-stats">
+                  <div class="ph-stat" id="ps1"><div class="ph-snum" id="pn1">20+</div><div class="ph-slbl">年業界經驗</div></div>
+                  <div class="ph-stat" id="ps2"><div class="ph-snum" id="pn2">500+</div><div class="ph-slbl">完工案例</div></div>
+                  <div class="ph-stat" id="ps3"><div class="ph-snum" id="pn3">98%</div><div class="ph-slbl">客戶滿意</div></div>
+                </div>
+                <div class="ph-sec">
+                  <div class="ph-stt" id="ph-st">核心服務</div>
+                  <div class="ph-cards">
+                    <div class="ph-card" id="pc1">
+                      <div class="ph-card-img" style="background-image:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=200&q=70')"></div>
+                      <div class="ph-card-body" id="pcb1">
+                        <div class="ph-ct" id="pct1">設備安裝</div>
+                        <div class="ph-card-more" id="pm1">了解更多</div>
+                      </div>
+                    </div>
+                    <div class="ph-card" id="pc2">
+                      <div class="ph-card-img" style="background-image:url('https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=200&q=70')"></div>
+                      <div class="ph-card-body" id="pcb2">
+                        <div class="ph-ct" id="pct2">定期維保</div>
+                        <div class="ph-card-more" id="pm2">了解更多</div>
+                      </div>
+                    </div>
+                    <div class="ph-card" id="pc3">
+                      <div class="ph-card-img" style="background-image:url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&q=70')"></div>
+                      <div class="ph-card-body" id="pcb3">
+                        <div class="ph-ct" id="pct3">核驗申請</div>
+                        <div class="ph-card-more" id="pm3">了解更多</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="mockup-hint">手機預覽（示意）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>參考網站（選填）</label>
+      <input type="text" id="ref" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>補充說明（選填）</label>
+      <textarea id="note" placeholder="任何想補充的需求或特殊要求"></textarea>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-prev" onclick="goStep(2)">← 上一步</button>
+      <button class="btn-next" onclick="goStep(4)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div id="step4" style="display:none">
+    <div class="section-tag">Step 04</div>
+    <div class="section-title">確認送出</div>
+    <div class="section-hint">請確認以下資訊，確認無誤後即可送出，設計師將收到完整規格與 AI 咒語。</div>
+    <div class="result-box">
+      <pre id="preview-text"></pre>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-prev" onclick="goStep(3)">← 修改</button>
+      <button class="btn-next" data-submit onclick="handleSubmit()">送出需求表單 ✓</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-wrap" style="display:none">
+    <div class="section-tag">完成</div>
+    <div class="section-title">🎉 需求表單已送出！</div>
+    <div class="section-hint">設計師已收到您的需求規格書，我們將在 1-2 個工作天內與您聯繫。</div>
+    <div class="result-box">
+      <pre id="spec-result"></pre>
+      <button class="btn-copy" onclick="copySpec()">複製規格書</button>
+      <span class="copy-ok" id="copy-ok">✓ 已複製</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var step=1, productOn=false, specText='';
+  var bgData={hex:'#111111',name:'黑'};
+  var acData={hex:'#E53935',name:'紅'};
+
+  function v(id){return(document.getElementById(id)||{}).value||'';}
+  function showErr(id,s){var e=document.getElementById(id);if(e)e.style.display=s?'block':'none';}
+  function getRows(lid){
+    return Array.prototype.slice.call(document.querySelectorAll('#'+lid+' .field-input'))
+      .map(function(i){return i.value.trim();}).filter(Boolean);
+  }
+
+  window.addRow=function(lid,max,type,ph){
+    var list=document.getElementById(lid);
+    if(list.querySelectorAll('.dynamic-row').length>=max)return;
+    var pm={contact:'電話｜LINE｜地址｜Email',svc:'服務名稱｜一句話說明',portfolio:'分類名稱',product:'商品分類'};
+    var r=document.createElement('div');r.className='dynamic-row';
+    r.innerHTML='<input type="text" class="field-input" placeholder="'+(pm[ph]||'')+'"/>'
+      +'<div class="row-btns"><button class="btn-icon btn-add" onclick="addRow(\''+lid+'\','+max+',\''+type+'\',\''+ph+'\')">＋</button>'
+      +'<button class="btn-icon btn-remove" onclick="removeRow(this)">−</button></div>';
+    list.appendChild(r);updBtns(lid);
+  };
+  window.removeRow=function(btn){
+    var r=btn.closest('.dynamic-row'),l=r.closest('.dynamic-list');
+    if(l.querySelectorAll('.dynamic-row').length<=1)return;
+    r.remove();updBtns(l.id);
+  };
+  function updBtns(lid){
+    var l=document.getElementById(lid);if(!l)return;
+    var rows=l.querySelectorAll('.dynamic-row');
+    rows.forEach(function(r){var b=r.querySelector('.btn-remove');if(b)b.disabled=rows.length<=1;});
+  }
+
+  document.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      this.classList.toggle('selected');
+      var inp=this.querySelector('input');if(inp)inp.checked=this.classList.contains('selected');
+      if(inp&&inp.id==='chip-portfolio')document.getElementById('cond-portfolio').classList.toggle('open',inp.checked);
+    });
+  });
+
+  window.toggleAddon=function(){
+    productOn=!productOn;
+    document.getElementById('product-toggle').classList.toggle('active',productOn);
+    document.getElementById('product-checkbox').textContent=productOn?'✓':'';
+    document.getElementById('cond-product').classList.toggle('open',productOn);
+  };
+
+  /* color picker */
+  window.selBg=function(el){
+    document.querySelectorAll('.bg-item .bg-sw').forEach(function(s){s.classList.remove('on');});
+    el.querySelector('.bg-sw').classList.add('on');
+    bgData={hex:el.dataset.hex,name:el.dataset.name};
+    document.getElementById('dot-bg').style.background=bgData.hex;
+    document.getElementById('lbl-bg').textContent='底色：'+bgData.name;
+    renderMock();
+  };
+  window.selAc=function(el){
+    document.querySelectorAll('.ac-sw').forEach(function(s){s.classList.remove('on');});
+    el.classList.add('on');
+    acData={hex:el.dataset.hex,name:el.dataset.name};
+    document.getElementById('dot-ac').style.background=acData.hex;
+    document.getElementById('lbl-ac').textContent='輔色：'+acData.name;
+    renderMock();
+  };
+
+  function isLight(h){
+    var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+    return(r*299+g*587+b*114)/1000>145;
+  }
+  function renderMock(){
+    var bg=bgData.hex,ac=acData.hex;
+    var blt=isLight(bg),alt=isLight(ac);
+    var txt=blt?'#111':'#fff';
+    var mt=blt?'rgba(0,0,0,0.45)':'rgba(255,255,255,0.45)';
+    var cbg=blt?'rgba(0,0,0,0.04)':'rgba(255,255,255,0.07)';
+    var cbd=blt?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.12)';
+    var sbg=blt?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.07)';
+    var ct=alt?'#111':'#fff';
+
+    // below-hero bg
+    document.getElementById('ph-below').style.background=bg;
+    document.getElementById('ph-sb').style.color=mt;
+
+    // logo always white (on hero image)
+    document.getElementById('ph-logo').style.color='#fff';
+
+    // hero accent highlight
+    document.getElementById('ph-hl').style.color=ac;
+
+    // CTA button on hero
+    var cta=document.getElementById('ph-cta');
+    cta.style.background=ac; cta.style.color=ct;
+
+    // stats
+    ['ps1','ps2','ps3'].forEach(function(id){document.getElementById(id).style.background=sbg;});
+    ['pn1','pn2','pn3'].forEach(function(id){document.getElementById(id).style.color=ac;});
+
+    // section title
+    document.getElementById('ph-st').style.color=txt;
+
+    // service cards
+    ['pc1','pc2','pc3'].forEach(function(id){
+      var c=document.getElementById(id);
+      c.style.borderColor=cbd;
+    });
+    ['pcb1','pcb2','pcb3'].forEach(function(id){
+      document.getElementById(id).style.background=cbg;
+    });
+    ['pct1','pct2','pct3'].forEach(function(id){
+      document.getElementById(id).style.color=txt;
+    });
+    // "了解更多" buttons follow accent color
+    ['pm1','pm2','pm3'].forEach(function(id){
+      var m=document.getElementById(id);
+      m.style.background=ac; m.style.color=ct;
+    });
+  }
+  renderMock();
+
+  window.goStep=function(n){
+    if(n>step){
+      if(step===1){
+        var ok=true;
+        if(!v('company')){showErr('err-company',true);ok=false;}else showErr('err-company',false);
+        if(!document.getElementById('industry').value){showErr('err-industry',true);ok=false;}else showErr('err-industry',false);
+        if(!getRows('contact-list').length){showErr('err-contact',true);ok=false;}else showErr('err-contact',false);
+        if(!ok)return;
+      }
+      if(step===2){
+        var ok2=true;
+        if(!v('usp')){showErr('err-usp',true);ok2=false;}else showErr('err-usp',false);
+        if(!getRows('svc-list').length){showErr('err-svc',true);ok2=false;}else showErr('err-svc',false);
+        if(!ok2)return;
+      }
+    }
+    document.getElementById('step'+step).style.display='none';
+    document.getElementById('s'+step).className='step done';
+    step=n;
+    document.getElementById('step'+n).style.display='block';
+    document.getElementById('s'+n).className='step active';
+    document.getElementById('progress').style.width=((n-1)/3*100)+'%';
+    if(n===4)document.getElementById('preview-text').textContent=buildSpec();
+    window.scrollTo(0,0);
+  };
+
+  /* stats generator */
+  function genStats(svcs,trust,usp,industry){
+    var defs={
+      engineering:[['20+','年業界經驗'],['500+','完工案例'],['98%','客戶滿意度']],
+      consulting:[['10+','年專業資歷'],['200+','服務客戶'],['95%','案件勝率']],
+      medical:[['15+','年醫療經驗'],['3000+','服務人次'],['99%','客戶好評']],
+      food:[['10+','年烘焙資歷'],['50+','招牌品項'],['4.9','顧客評分']],
+      design:[['8+','年設計經驗'],['300+','完成作品'],['100%','客製化服務']],
+      other:[['10+','年業界資歷'],['200+','服務案例'],['98%','客戶回購率']]
+    };
+    var key='other';
+    if(industry.indexOf('工程')>-1||industry.indexOf('施工')>-1)key='engineering';
+    else if(industry.indexOf('顧問')>-1||industry.indexOf('專業')>-1)key='consulting';
+    else if(industry.indexOf('醫療')>-1||industry.indexOf('美容')>-1)key='medical';
+    else if(industry.indexOf('餐飲')>-1)key='food';
+    else if(industry.indexOf('設計')>-1)key='design';
+    var def=defs[key];
+    var blocks=[];
+    if(trust){
+      trust.split(/[、，,；;｜|\n]/).forEach(function(p){
+        var m=p.match(/(\d+[\+\%年件萬人次]?)/);
+        if(m&&blocks.length<3){
+          var lbl=p.replace(m[0],'').replace(/[：:是共約有超過]/g,'').trim();
+          if(!lbl||lbl.length<2)lbl=def[blocks.length][1];
+          blocks.push([m[0],lbl]);
+        }
+      });
+    }
+    while(blocks.length<3)blocks.push(def[blocks.length]);
+    var out=['[數字成就跳動]'];
+    blocks.slice(0,3).forEach(function(b,i){out.push('區塊'+(i+1));out.push('1、'+b[0]);out.push('2、'+b[1]);});
+    return out.join('\n');
+  }
+
+  function buildSpec(){
+    var dynamics=Array.prototype.slice.call(document.querySelectorAll('input[name="dynamic"]:checked')).map(function(e){return e.value;});
+    var ind=document.getElementById('industry');
+    var indT=ind?ind.options[ind.selectedIndex].text:'';
+    var contacts=getRows('contact-list');
+    var svcs=getRows('svc-list');
+    var portfolios=getRows('portfolio-list');
+    var products=getRows('product-list');
+    var stats=genStats(svcs,v('trust'),v('usp'),indT);
+    var L=[
+      '══════════════════════════════════════',
+      '  網站需求規格書（Website Spec）',
+      '══════════════════════════════════════','',
+      '【基本資訊】','網站顯示名稱：'+v('company'),'行業別：'+indT,'聯絡方式：'
+    ];
+    contacts.forEach(function(c,i){L.push('  '+(i+1)+'. '+c);});
+    L.push('','【品牌核心】','USP：'+v('usp'),'品牌故事：'+(v('story')||'（無）'),'信任背書：'+(v('trust')||'（無）'));
+    L.push('','【核心服務項目】');svcs.forEach(function(s,i){L.push('  服務'+(i+1)+'：'+s);});
+    L.push('','【網站功能】','動態功能：'+(dynamics.join('、')||'（未選）'));
+    if(portfolios.length)L.push('作品分類：'+portfolios.join('、'));
+    L.push('產品展示加購：'+(productOn?'是（+NT$2,000/年）':'否'));
+    if(productOn&&products.length)L.push('商品分類：'+products.join('、'));
+    L.push('','【配色偏好】','底色：'+bgData.name+' ('+bgData.hex+')','輔助色：'+acData.name+' ('+acData.hex+')','參考網站：'+(v('ref')||'（無）'),'補充說明：'+(v('note')||'（無）'));
+    L.push('',stats);
+    L.push('',
+      '══════════════════════════════════════',
+      '  AI 咒語（直接貼給 Claude / Gemini）',
+      '══════════════════════════════════════','',
+      '你現在是一位精準高效的前端網頁工程師。',
+      '請根據以下客戶規格，輸出純 HTML + Tailwind CSS 代碼。',
+      '拆分成四個獨立代碼區塊：',
+      '1. [HEADER] — 全站共用頁首','2. [HOME BODY] — 首頁主體',
+      '3. [INNER BODY] — 內頁通用主體','4. [FOOTER] — 全站共用頁尾','',
+      '底色：'+bgData.name+' ('+bgData.hex+')','輔助色：'+acData.name+' ('+acData.hex+')',
+      '品牌名稱：'+v('company'),'USP：'+v('usp'),'品牌故事：'+(v('story')||'（無）')
+    );
+    svcs.forEach(function(s,i){L.push('服務'+(i+1)+'：'+s);});
+    L.push('信任背書：'+(v('trust')||'（無）'),'動態功能：'+(dynamics.join('、')||'（未選）'),'',
+      'Hero KV 規則：主標題以白字為主，值得 Highlight 的關鍵字套用輔助色 ('+acData.hex+')，整體底色 ('+bgData.hex+') 為主背景。',''
+    );
+    L.push(stats);
+    L.push('',
+      '請根據 USP 與品牌故事，先產出 3 個 Hero Slogan 選項（繁體中文，10字以內），再產出 HTML 代碼，並將第 1 個 Slogan 帶入 Hero 標題。',
+      '注意：動態內容預留 WordPress class，CTA 按鈕預留 #contact 錨點，不要輸出說明文字。','',
+      '══════════════════════════════════════',
+      '產生時間：'+new Date().toLocaleString('zh-TW'),
+      '══════════════════════════════════════'
+    );
+    return L.join('\n');
+  }
+
+  emailjs.init('7MOWddBP637BbJ6Jp');
+  window.handleSubmit=function(){
+    specText=buildSpec();
+    var btn=document.querySelector('[data-submit]');
+    btn.textContent='寄送中…';btn.disabled=true;
+    emailjs.send('service_04lt93c','template_vb0r0fq',{company:v('company'),message:specText})
+    .then(function(){
+      document.getElementById('step4').style.display='none';
+      document.getElementById('s4').className='step done';
+      document.getElementById('progress').style.width='100%';
+      document.getElementById('result-wrap').style.display='block';
+      document.getElementById('spec-result').textContent=specText;
+      window.scrollTo(0,0);
+    },function(err){
+      btn.textContent='送出需求表單 ✓';btn.disabled=false;
+      alert('寄送失敗，請稍後再試。錯誤：'+JSON.stringify(err));
+    });
+  };
+  window.copySpec=function(){
+    var t=document.getElementById('spec-result').textContent||specText;
+    navigator.clipboard.writeText(t).then(function(){
+      var ok=document.getElementById('copy-ok');ok.style.display='inline';
+      setTimeout(function(){ok.style.display='none';},2000);
+    });
+  };
+
+  ['contact-list','svc-list','portfolio-list','product-list'].forEach(updBtns);
+})();
+</script>
+</body>
+</html>
