@@ -575,10 +575,14 @@
   }
 
   document.querySelectorAll('.chip').forEach(function(c){
-    c.addEventListener('click',function(){
-      this.classList.toggle('selected');
-      var inp=this.querySelector('input');if(inp)inp.checked=this.classList.contains('selected');
-      if(inp&&inp.id==='chip-portfolio')document.getElementById('cond-portfolio').classList.toggle('open',inp.checked);
+    c.addEventListener('click',function(e){
+      e.preventDefault();
+      var inp=this.querySelector('input');
+      if(inp){
+        inp.checked=!inp.checked;
+        this.classList.toggle('selected',inp.checked);
+        if(inp.id==='chip-portfolio')document.getElementById('cond-portfolio').classList.toggle('open',inp.checked);
+      }
     });
   });
 
